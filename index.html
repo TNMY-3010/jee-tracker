@@ -233,13 +233,11 @@
             gap: 5px; 
         }
         
-        /* Ensure textarea takes the space */
         .task-input-form textarea {
             min-height: 80px; 
             resize: vertical;
         }
 
-        /* Ensure the Add Task button aligns properly */
         .task-input-form button {
             align-self: flex-start;
             width: auto !important; 
@@ -269,21 +267,46 @@
         .task-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: rgba(55, 65, 81, 0.5); transition: background 0.3s ease; }
         body.light-mode .task-item { background: #f3f4f6; color: #1f2937; }
         
-        /* THEME TOGGLE */
-        .theme-toggle {
-            position: fixed; top: 10px; right: 10px; width: 50px; height: 50px; border-radius: 50%;
-            background: #fcd34d; color: #1f2937; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.2rem; z-index: 1000;
+        /* STUDY LOG STYLES */
+        .log-entry {
+            background: rgba(55, 65, 81, 0.3);
+            border-left: 4px solid #fcd34d; /* Gold accent line */
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s ease;
         }
-        body.light-mode .theme-toggle { background: #1f2937; color: #fcd34d; }
-        
-        .hidden { display: none; }
 
-        /* FOOTER STYLES (Improved Visibility) */
+        body.light-mode .log-entry {
+            background: #f9fafb;
+            border-left-color: #1e40af;
+        }
+
+        .log-time {
+            font-weight: 700;
+            color: #63b3ed;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        body.light-mode .log-time {
+            color: #2563eb;
+        }
+
+        .log-description {
+            flex-grow: 1;
+        }
+
+        /* FOOTER STYLES */
         .footer {
             text-align: center;
             padding: 15px 0 10px 0;
-            font-size: 0.8rem; /* Slightly larger text */
-            color: #6b7280; /* Better visibility in dark mode */
+            font-size: 0.8rem; 
+            color: #6b7280; 
             transition: color 0.5s ease;
         }
 
@@ -292,16 +315,17 @@
         }
 
         .footer a {
-            color: #fcd34d; /* Use gold accent for the link */
+            color: #fcd34d; 
             text-decoration: none;
             font-weight: 700;
             transition: color 0.3s ease;
         }
         
         body.light-mode .footer a {
-             color: #1e40af; /* Deep blue in light mode */
+             color: #1e40af; 
         }
         
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -350,6 +374,37 @@
             </div>
             <button class="btn-primary" onclick="addTest()">Add Test Result</button>
         </div>
+
+        <!-- NEW STUDY LOG CARD -->
+        <div class="card">
+            <h2 style="display: flex; justify-content: space-between;">
+                ⏳ Study Log 
+                <span style="font-size: 1rem; color: #fcd34d;" id="totalStudyHours">Total Logged: 0.0 hrs</span>
+            </h2>
+
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr 3fr;">
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="logDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Time Block (e.g., 9-12)</label>
+                    <input type="text" id="logTime" placeholder="10:00 AM - 1:00 PM" required>
+                </div>
+                <div class="form-group">
+                    <label>Activity Studied</label>
+                    <input type="text" id="logActivity" placeholder="Physics numericals, Organic chemistry theory" required>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="addStudyLog()">Log Study Session</button>
+            
+            <h3 style="color: #63b3ed; margin-top: 25px; margin-bottom: 10px;">Recent Sessions</h3>
+            <div id="studyLogList">
+                <p class="empty-state" style="padding: 10px; border-top: none;">No study sessions logged yet.</p>
+            </div>
+        </div>
+        <!-- END NEW STUDY LOG CARD -->
+
 
         <!-- PERFORMANCE CHARTS CARD -->
         <div class="card" id="chartCard" style="display: none;">
@@ -425,20 +480,21 @@
         </div>
         <!-- END STUDY PLANNER CARD -->
         
-        <!-- NEW FOOTER -->
+        <!-- FOOTER -->
         <div class="footer">
             Webpage created by <a href="https://github.com/TNMY-3010" target="_blank">Tnmy</a>
         </div>
-        <!-- END NEW FOOTER -->
+        <!-- END FOOTER -->
 
     </div>
 
 
     <script>
         let tests = [];
+        let tasks = {};
+        let studyLogs = []; // NEW: Array for study log entries
         let chart = null;
 
-        let tasks = {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
         let selectedDate = new Date(); 
@@ -446,6 +502,7 @@
         window.onload = function() {
             loadTests();
             loadTasks(); 
+            loadStudyLogs(); // Load new log data
             loadTheme();
             updateUI();
             renderCalendar(); 
@@ -481,24 +538,15 @@
             updateChart(); 
         }
 
-        // --- Test Tracker Functions ---
-
+        // --- Test Tracker Functions (Unchanged) ---
         function loadTests() {
             const saved = localStorage.getItem('jee-tests');
             if (saved) {
-                try {
-                    tests = JSON.parse(saved);
-                } catch (e) {
-                    console.error('Error loading tests:', e);
-                    tests = [];
-                }
+                try { tests = JSON.parse(saved); } catch (e) { console.error('Error loading tests:', e); tests = []; }
             }
         }
-
-        function saveTests() {
-            localStorage.setItem('jee-tests', JSON.stringify(tests));
-        }
-
+        function saveTests() { localStorage.setItem('jee-tests', JSON.stringify(tests)); }
+        
         function addTest() {
             const date = document.getElementById('testDate').value;
             const physics = parseFloat(document.getElementById('physics').value);
@@ -514,17 +562,7 @@
             const total = physics + chemistry + maths;
             const percentage = (total / totalMarks) * 100;
 
-            const test = {
-                id: Date.now(),
-                date: date,
-                physics: physics,
-                chemistry: chemistry,
-                maths: maths,
-                total: total,
-                totalMarks: totalMarks,
-                percentage: percentage
-            };
-
+            const test = { id: Date.now(), date, physics, chemistry, maths, total, totalMarks, percentage };
             tests.push(test);
             tests.sort((a, b) => new Date(a.date) - new Date(b.date));
             saveTests();
@@ -550,10 +588,11 @@
             updateStats();
             updateChart();
             updateTable();
+            renderStudyLogs(); // Update Study Log List and Total
         }
-
+        
         function updateStats() {
-            if (tests.length === 0) {
+             if (tests.length === 0) {
                 document.getElementById('statsContainer').classList.add('hidden');
                 return;
             }
@@ -607,22 +646,13 @@
 
         function updateChart() {
             const chartCard = document.getElementById('chartCard');
-            
-            if (tests.length === 0) {
-                chartCard.style.display = 'none';
-                return;
-            }
-
+            if (tests.length === 0) { chartCard.style.display = 'none'; return; }
             chartCard.style.display = 'block';
 
             const ctx = document.getElementById('trendChart').getContext('2d');
-            
-            if (chart) {
-                chart.destroy();
-            }
+            if (chart) { chart.destroy(); }
 
             const labels = tests.map(t => new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
-            
             const isLightMode = document.body.classList.contains('light-mode');
             const textColor = isLightMode ? '#1f2937' : '#e5e7eb';
             const gridColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
@@ -632,80 +662,18 @@
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: 'Total Score',
-                            data: tests.map(t => t.total),
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            borderWidth: 3,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Physics',
-                            data: tests.map(t => t.physics),
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Chemistry',
-                            data: tests.map(t => t.chemistry),
-                            borderColor: '#0d9488', 
-                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Maths',
-                            data: tests.map(t => t.maths),
-                            borderColor: '#fcd34d', 
-                            backgroundColor: 'rgba(252, 211, 77, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4
-                        }
+                        { label: 'Total Score', data: tests.map(t => t.total), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', borderWidth: 3, tension: 0.4 },
+                        { label: 'Physics', data: tests.map(t => t.physics), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, tension: 0.4 },
+                        { label: 'Chemistry', data: tests.map(t => t.chemistry), borderColor: '#0d9488', backgroundColor: 'rgba(13, 148, 136, 0.1)', borderWidth: 2, tension: 0.4 },
+                        { label: 'Maths', data: tests.map(t => t.maths), borderColor: '#fcd34d', backgroundColor: 'rgba(252, 211, 77, 0.1)', borderWidth: 2, tension: 0.4 }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                color: textColor 
-                            }
-                        }
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'top', labels: { color: textColor } } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Marks',
-                                color: textColor
-                            },
-                            ticks: {
-                                color: textColor
-                            },
-                            grid: {
-                                color: gridColor
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Test Date',
-                                color: textColor
-                            },
-                            ticks: {
-                                color: textColor
-                            },
-                            grid: {
-                                color: gridColor
-                            }
-                        }
+                        y: { beginAtZero: true, title: { display: true, text: 'Marks', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } },
+                        x: { title: { display: true, text: 'Test Date', color: textColor }, ticks: { color: textColor }, grid: { color: gridColor } }
                     }
                 }
             });
@@ -715,11 +683,7 @@
             const tableCard = document.getElementById('tableCard');
             const tbody = document.getElementById('testTableBody');
 
-            if (tests.length === 0) {
-                tableCard.style.display = 'none';
-                return;
-            }
-
+            if (tests.length === 0) { tableCard.style.display = 'none'; return; }
             tableCard.style.display = 'block';
 
             tbody.innerHTML = tests.map(test => {
@@ -738,13 +702,10 @@
             }).join('');
         }
         
-        // --- Data Import/Export Functions ---
+        // --- Data Import/Export Functions (Updated to include studyLogs) ---
 
         function exportData() {
-            const exportObject = {
-                tests: tests,
-                tasks: tasks
-            };
+            const exportObject = { tests, tasks, studyLogs };
             const dataStr = JSON.stringify(exportObject, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(dataBlob);
@@ -762,15 +723,9 @@
                 reader.onload = function(e) {
                     try {
                         const importedData = JSON.parse(e.target.result);
-                        if (importedData.tests) {
-                            tests = importedData.tests;
-                            saveTests();
-                        }
-                        if (importedData.tasks) {
-                            tasks = importedData.tasks;
-                            saveTasks();
-                            renderCalendar();
-                        }
+                        if (importedData.tests) { tests = importedData.tests; saveTests(); }
+                        if (importedData.tasks) { tasks = importedData.tasks; saveTasks(); renderCalendar(); }
+                        if (importedData.studyLogs) { studyLogs = importedData.studyLogs; saveStudyLogs(); } // Import study logs
                         updateUI();
                         alert('Data imported successfully!');
                     } catch (error) {
@@ -781,44 +736,25 @@
             }
         }
 
-        // --- Calendar & Task Functions ---
-
+        // --- Calendar & Task Functions (Unchanged) ---
         function loadTasks() {
             const savedTasks = localStorage.getItem('jee-tasks');
             if (savedTasks) {
-                try {
-                    tasks = JSON.parse(savedTasks);
-                } catch (e) {
-                    console.error('Error loading tasks:', e);
-                    tasks = {};
-                }
+                try { tasks = JSON.parse(savedTasks); } catch (e) { console.error('Error loading tasks:', e); tasks = {}; }
             }
         }
-
-        function saveTasks() {
-            localStorage.setItem('jee-tasks', JSON.stringify(tasks));
-        }
-
+        function saveTasks() { localStorage.setItem('jee-tasks', JSON.stringify(tasks)); }
         function renderCalendar() {
-            const today = new Date();
+             const today = new Date();
             const grid = document.getElementById('calendarGrid');
             const header = document.getElementById('currentMonthYear');
             
-            while (grid.children.length > 7) {
-                grid.removeChild(grid.lastChild);
-            }
-
-            const monthNames = ["January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            ];
-
+            while (grid.children.length > 7) { grid.removeChild(grid.lastChild); }
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             header.textContent = `${monthNames[currentMonth]} ${currentYear}`;
-
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            let dayCount = 1;
-
-            // 1. Add preceding days as invisible elements (for spacing)
+            
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day', 'inactive');
@@ -826,7 +762,6 @@
                 grid.appendChild(dayDiv);
             }
 
-            // 2. Add active days for the current month
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day');
@@ -836,30 +771,22 @@
                 dayDiv.setAttribute('data-date', dateStr);
                 dayDiv.onclick = () => selectDate(dateStr);
                 
-                if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
-                    dayDiv.classList.add('today');
-                }
-
+                if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) { dayDiv.classList.add('today'); }
                 if (dateStr === selectedDate.toDateString()) {
-                    // Check if it's already selected and if so, don't double select
                     if (!dayDiv.classList.contains('selected')) {
                         document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
                         dayDiv.classList.add('selected');
                     }
                 }
 
-                // Add task dot 
                 if (tasks[dateStr] && tasks[dateStr].length > 0) {
                     const dot = document.createElement('span');
                     dot.classList.add('task-dot');
                     dayDiv.appendChild(dot);
                 }
-
                 grid.appendChild(dayDiv);
-                dayCount++;
             }
 
-            // 3. Add succeeding days as invisible elements
             const currentCells = grid.children.length;
             const cellsNeeded = 7 * Math.ceil(currentCells / 7);
             
@@ -870,51 +797,30 @@
                 grid.appendChild(dayDiv);
             }
         }
-
         function changeMonth(step) {
             currentMonth += step;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; } else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             const newDate = new Date(currentYear, currentMonth, selectedDate.getDate());
-            if (newDate.getMonth() !== currentMonth) {
-                selectedDate = new Date(currentYear, currentMonth, 1);
-            } else {
-                selectedDate = newDate;
-            }
+            if (newDate.getMonth() !== currentMonth) { selectedDate = new Date(currentYear, currentMonth, 1); } else { selectedDate = newDate; }
             renderCalendar();
             selectDate(selectedDate.toDateString());
         }
-
         function selectDate(dateStr) {
             document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
-            
             const newSelectedDayElement = document.querySelector(`.calendar-day[data-date="${dateStr}"]`);
-            if(newSelectedDayElement) {
-                newSelectedDayElement.classList.add('selected');
-            }
-
+            if(newSelectedDayElement) { newSelectedDayElement.classList.add('selected'); }
             selectedDate = new Date(dateStr);
             document.getElementById('selectedDateTitle').textContent = `Tasks for ${selectedDate.toLocaleDateString('en-GB', {weekday: 'short', day: 'numeric', month: 'long'})}`;
-            
             renderTasks();
         }
-
         function renderTasks() {
             const taskList = document.getElementById('taskList');
             const dateKey = selectedDate.toDateString();
             const dailyTasks = tasks[dateKey] || [];
-
             if (dailyTasks.length === 0) {
                 taskList.innerHTML = '<p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>';
                 return;
             }
-
             taskList.innerHTML = dailyTasks.map(task => `
                 <div class="task-item">
                     <span>${task.text}</span>
@@ -922,22 +828,13 @@
                 </div>
             `).join('');
         }
-
         function addTask() {
             const taskInput = document.getElementById('taskInput');
             const taskText = taskInput.value.trim();
             const dateKey = selectedDate.toDateString();
-
             if (taskText) {
-                if (!tasks[dateKey]) {
-                    tasks[dateKey] = [];
-                }
-                
-                tasks[dateKey].push({
-                    id: Date.now(),
-                    text: taskText
-                });
-                
+                if (!tasks[dateKey]) { tasks[dateKey] = []; }
+                tasks[dateKey].push({ id: Date.now(), text: taskText });
                 taskInput.value = '';
                 saveTasks();
                 renderTasks();
@@ -946,18 +843,131 @@
                 alert('Please enter a task description.');
             }
         }
-
         function deleteTask(id) {
             const dateKey = selectedDate.toDateString();
             if (tasks[dateKey]) {
                 tasks[dateKey] = tasks[dateKey].filter(task => task.id !== id);
-                if (tasks[dateKey].length === 0) {
-                    delete tasks[dateKey]; 
-                }
+                if (tasks[dateKey].length === 0) { delete tasks[dateKey]; }
                 saveTasks();
                 renderTasks();
                 renderCalendar(); 
             }
+        }
+        
+        // --- NEW Study Log Functions ---
+
+        function loadStudyLogs() {
+            const savedLogs = localStorage.getItem('jee-study-logs');
+            if (savedLogs) {
+                try { studyLogs = JSON.parse(savedLogs); } catch (e) { console.error('Error loading study logs:', e); studyLogs = []; }
+            }
+        }
+
+        function saveStudyLogs() {
+            localStorage.setItem('jee-study-logs', JSON.stringify(studyLogs));
+        }
+
+        function parseTime(timeString) {
+            // Very simple parser for time strings like "10:00 AM - 1:00 PM"
+            const parts = timeString.split('-').map(s => s.trim());
+            if (parts.length !== 2) return 0;
+
+            const parseSingleTime = (t) => {
+                const isPM = t.toUpperCase().includes('PM');
+                t = t.replace(/(am|pm)/i, '').trim();
+                let [h, m] = t.split(':').map(Number);
+                if (isNaN(h) || isNaN(m)) return 0;
+                
+                if (isPM && h !== 12) h += 12;
+                if (!isPM && h === 12) h = 0; // Midnight 12:00 AM
+                return h * 60 + m; // Total minutes
+            };
+
+            const startMinutes = parseSingleTime(parts[0]);
+            const endMinutes = parseSingleTime(parts[1]);
+
+            // Handle overnight shifts (e.g., 10 PM - 2 AM) by adding 24 hours to the end time if it's earlier
+            let durationMinutes = endMinutes - startMinutes;
+            if (durationMinutes < 0) {
+                durationMinutes += 24 * 60;
+            }
+            
+            return durationMinutes / 60; // Duration in hours
+        }
+
+        function addStudyLog() {
+            const date = document.getElementById('logDate').value;
+            const time = document.getElementById('logTime').value.trim();
+            const activity = document.getElementById('logActivity').value.trim();
+
+            if (!date || !time || !activity) {
+                alert('Please fill in all fields for the Study Log.');
+                return;
+            }
+            
+            const hours = parseTime(time);
+            if (hours <= 0 || hours > 12) {
+                // Warning if the time format is unparseable or duration is suspiciously long/zero
+                console.warn(`Could not reliably parse duration from: ${time}. Hours defaulting to 1.`);
+                // We default to 1 hour if parsing fails, but warn the user if it's obviously wrong.
+                if (hours <= 0) alert('Could not calculate a positive duration from the time block. Please check the format (e.g., 10:00 AM - 1:00 PM).');
+            }
+
+            const log = {
+                id: Date.now(),
+                date: date,
+                time: time,
+                activity: activity,
+                hours: hours || 1 // Store calculated hours, default to 1 if parsing failed
+            };
+
+            studyLogs.push(log);
+            studyLogs.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
+            saveStudyLogs();
+
+            // Clear form
+            document.getElementById('logDate').value = '';
+            document.getElementById('logTime').value = '';
+            document.getElementById('logActivity').value = '';
+
+            renderStudyLogs();
+        }
+        
+        function deleteStudyLog(id) {
+            if (confirm('Are you sure you want to delete this study session?')) {
+                studyLogs = studyLogs.filter(log => log.id !== id);
+                saveStudyLogs();
+                renderStudyLogs();
+            }
+        }
+
+        function renderStudyLogs() {
+            const listContainer = document.getElementById('studyLogList');
+            const totalHoursSpan = document.getElementById('totalStudyHours');
+
+            if (studyLogs.length === 0) {
+                listContainer.innerHTML = '<p class="empty-state" style="padding: 10px; border-top: none;">No study sessions logged yet.</p>';
+                totalHoursSpan.textContent = `Total Logged: 0.0 hrs`;
+                return;
+            }
+
+            const totalHours = studyLogs.reduce((sum, log) => sum + (log.hours || 0), 0);
+            totalHoursSpan.textContent = `Total Logged: ${totalHours.toFixed(1)} hrs`;
+            
+            listContainer.innerHTML = studyLogs.map(log => {
+                const formattedDate = new Date(log.date).toLocaleDateString('en-GB');
+                return `
+                    <div class="log-entry">
+                        <div class="log-description">
+                            <strong style="color: #fcd34d;">${formattedDate}</strong> | 
+                            <span class="log-time">${log.time}</span> 
+                            - ${log.activity} 
+                        </div>
+                        <span style="font-size: 0.8rem; margin-right: 10px; flex-shrink: 0;">(${log.hours.toFixed(1)} hrs)</span>
+                        <button class="btn-delete" onclick="deleteStudyLog(${log.id})">Remove</button>
+                    </div>
+                `;
+            }).join('');
         }
     </script>
 </body>
