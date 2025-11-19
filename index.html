@@ -226,20 +226,15 @@
         
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         
-        /* Specific fix for task input section */
+        /* Task Input Form Styling */
         .task-input-form {
             display: flex;
             flex-direction: column;
             gap: 5px; 
         }
         
-        /* Ensure textarea takes the space */
-        .task-input-form textarea {
-            min-height: 80px; 
-            resize: vertical;
-        }
+        .task-input-form textarea { min-height: 80px; resize: vertical; }
 
-        /* Ensure the Add Task button aligns properly */
         .task-input-form button {
             align-self: flex-start;
             width: auto !important; 
@@ -247,7 +242,7 @@
             padding: 8px 15px; 
         }
 
-
+        /* Calendar Grid */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -269,30 +264,80 @@
         .task-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: rgba(55, 65, 81, 0.5); transition: background 0.3s ease; }
         body.light-mode .task-item { background: #f3f4f6; color: #1f2937; }
         
-        /* STUDY LOG STYLES */
+        /* STUDY LOG STYLES FIXES */
+        
+        /* 1. Mobile Fix: Ensure form fields stack on small screens */
+        .log-form-grid {
+            display: flex;
+            flex-direction: column; /* Default: Stack vertically */
+            gap: 15px;
+        }
+        
+        /* 2. Desktop Fix: Revert to 3-column layout on large screens */
+        @media (min-width: 600px) {
+            .log-form-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr 3fr; /* Original columns for desktop */
+                gap: 15px;
+            }
+        }
+
+        /* 3. Log Entry Layout Fix */
         .log-entry {
             background: rgba(55, 65, 81, 0.3);
-            border-left: 4px solid #fcd34d; /* Gold accent line */
+            border-left: 4px solid #fcd34d; 
             padding: 10px 15px;
             border-radius: 6px;
             margin-bottom: 8px;
             font-size: 0.95rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* Default: Stack vertically on mobile */
             transition: background 0.2s ease;
         }
 
+        /* Desktop: Revert log entries to horizontal flex */
+        @media (min-width: 768px) {
+            .log-entry {
+                flex-direction: row; 
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+        
         body.light-mode .log-entry {
             background: #f9fafb;
             border-left-color: #1e40af;
         }
 
+        .log-details {
+            display: flex;
+            flex-direction: column; /* Stack date/time on mobile */
+            flex-grow: 1;
+        }
+        
+        @media (min-width: 768px) {
+             .log-details {
+                flex-direction: row; /* Horizontal on desktop */
+                align-items: center;
+            }
+        }
+
+        .log-date-time {
+            margin-bottom: 5px;
+        }
+        
+        @media (min-width: 768px) {
+             .log-date-time {
+                margin-bottom: 0;
+                margin-right: 15px;
+            }
+        }
+
+
         .log-time {
             font-weight: 700;
             color: #63b3ed;
-            margin-right: 15px;
-            flex-shrink: 0;
+            margin-right: 10px;
         }
         
         body.light-mode .log-time {
@@ -300,8 +345,30 @@
         }
 
         .log-description {
-            flex-grow: 1;
+            font-size: 0.9rem;
+            word-break: break-word; /* Ensure long text wraps */
+            margin-top: 5px;
         }
+        
+        @media (min-width: 768px) {
+             .log-description {
+                margin-top: 0;
+            }
+        }
+        
+        .log-hours {
+            font-size: 0.8rem;
+            margin: 5px 0;
+            flex-shrink: 0;
+        }
+        
+        @media (min-width: 768px) {
+            .log-hours {
+                margin-left: auto;
+                margin-right: 10px;
+            }
+        }
+
 
         /* FOOTER STYLES */
         .footer {
@@ -448,7 +515,7 @@
                 <span style="font-size: 1rem; color: #fcd34d;" id="totalStudyHours">Total Logged: 0.0 hrs</span>
             </h2>
 
-            <div class="form-grid" style="grid-template-columns: 1fr 1fr 3fr;">
+            <div class="log-form-grid">
                 <div class="form-group">
                     <label>Date</label>
                     <input type="date" id="logDate" required>
@@ -524,7 +591,7 @@
             updateChart(); 
         }
 
-        // --- Test Tracker Functions ---
+        // --- Test Tracker Functions (Unchanged) ---
         function loadTests() {
             const saved = localStorage.getItem('jee-tests');
             if (saved) {
@@ -722,7 +789,7 @@
             }
         }
 
-        // --- Calendar & Task Functions ---
+        // --- Calendar & Task Functions (Unchanged) ---
         function loadTasks() {
             const savedTasks = localStorage.getItem('jee-tasks');
             if (savedTasks) {
@@ -944,12 +1011,16 @@
                 const formattedDate = new Date(log.date).toLocaleDateString('en-GB');
                 return `
                     <div class="log-entry">
-                        <div class="log-description">
-                            <strong style="color: #fcd34d;">${formattedDate}</strong> | 
-                            <span class="log-time">${log.time}</span> 
-                            - ${log.activity} 
+                        <div class="log-details">
+                            <div class="log-date-time">
+                                <strong style="color: #fcd34d;">${formattedDate}</strong> | 
+                                <span class="log-time">${log.time}</span> 
+                            </div>
+                            <div class="log-description">
+                                ${log.activity} 
+                            </div>
                         </div>
-                        <span style="font-size: 0.8rem; margin-right: 10px; flex-shrink: 0;">(${log.hours.toFixed(1)} hrs)</span>
+                        <span class="log-hours">(${log.hours.toFixed(1)} hrs)</span>
                         <button class="btn-delete" onclick="deleteStudyLog(${log.id})">Remove</button>
                     </div>
                 `;
