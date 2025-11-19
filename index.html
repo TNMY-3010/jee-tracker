@@ -190,6 +190,17 @@
         .btn-secondary:hover {
             background: #e5e7eb;
         }
+
+        .btn-planner {
+            background: #f59e0b;
+            color: white;
+            padding: 10px 20px;
+            width: auto;
+        }
+        .btn-planner:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
         
         .btn-export {
             background: #10b981;
@@ -317,16 +328,45 @@
             background: #334155;
         }
 
-        /* NEW CALENDAR STYLES (Minimalist) */
-        .calendar-container {
+        /* MODAL (New Separate Section) STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
             display: flex;
-            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
         }
 
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.4);
+            max-width: 800px;
+            width: 90%;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode .modal-content {
+            background: #1e293b;
+            color: #e2e8f0;
+        }
+
+        .calendar-task-layout {
+            display: flex;
+            gap: 40px;
+            padding-top: 15px;
+        }
+
+        /* CALENDAR STYLES (Minimalist - Fixed Width) */
         .calendar-wrapper {
-            max-width: 320px; /* Reduced max width for minimal size */
+            max-width: 320px; 
             flex-shrink: 0;
-            padding-bottom: 15px;
         }
         
         .calendar-header {
@@ -346,7 +386,7 @@
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px; /* Reduced gap */
+            gap: 2px;
             text-align: center;
             font-size: 0.9rem;
         }
@@ -360,21 +400,24 @@
         }
         .calendar-day {
             padding: 8px 0px;
-            border-radius: 4px; /* Slightly smaller borders */
+            border-radius: 4px; 
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
             position: relative;
-            line-height: 1; /* Tighter spacing */
+            line-height: 1;
         }
+
+        /* Hide dates outside current month */
+        .calendar-day.inactive {
+            visibility: hidden; 
+            pointer-events: none;
+        }
+        
         .calendar-day:hover {
             background-color: #e5e7eb;
         }
         body.dark-mode .calendar-day:hover {
             background-color: #334155;
-        }
-        .calendar-day.inactive {
-            color: #d1d5db;
-            pointer-events: none;
         }
         .calendar-day.today {
             background-color: #eff6ff;
@@ -392,22 +435,22 @@
         }
         .task-dot {
             position: absolute;
-            bottom: 2px; /* Moved down */
+            bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px; /* Smaller dot */
+            width: 4px;
             height: 4px; 
             background-color: #ef4444; 
             border-radius: 50%;
         }
 
-        /* NEW TASK DISPLAY STYLES (Separate Section) */
-        .task-input-section {
+        /* TASK DISPLAY STYLES */
+        .task-section {
             flex-grow: 1;
         }
 
         .task-display {
-            margin-top: 15px;
+            margin-top: 20px;
             padding-top: 15px;
             border-top: 1px solid #e5e7eb;
         }
@@ -440,54 +483,20 @@
     <div class="container">
         <div class="card">
             <h1>🎯 JEE Test Progress Tracker</h1>
-            <p class="subtitle">Track your performance every 21 days</p>
+            <p class="subtitle">Track your performance and manage your study plan.</p>
             
-            <div class="button-group">
-                <button class="btn-export" onclick="exportData()">📥 Export Data</button>
-                <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
-                <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="button-group">
+                    <button class="btn-export" onclick="exportData()">📥 Export Data</button>
+                    <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
+                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
+                </div>
+                <button class="btn-planner" onclick="openPlanner()">🗓️ Open Study Planner</button>
             </div>
         </div>
 
         <div id="statsContainer" class="hidden"></div>
 
-        <div class="card">
-            <h2>📅 Study Planner</h2>
-            <div class="calendar-container">
-                
-                <div class="calendar-wrapper">
-                    <div class="calendar-header">
-                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664;</button>
-                        <h3 id="currentMonthYear"></h3>
-                        <button class="btn-secondary" onclick="changeMonth(1)">&#9654;</button>
-                    </div>
-                    <div class="calendar-grid" id="calendarGrid">
-                        <div class="calendar-day-name">Sun</div>
-                        <div class="calendar-day-name">Mon</div>
-                        <div class="calendar-day-name">Tue</div>
-                        <div class="calendar-day-name">Wed</div>
-                        <div class="calendar-day-name">Thu</div>
-                        <div class="calendar-day-name">Fri</div>
-                        <div class="calendar-day-name">Sat</div>
-                    </div>
-                </div>
-
-                <div class="task-input-section">
-                    <h3 id="selectedDateTitle">Select a date to manage tasks</h3>
-                    <div class="form-group" style="margin-top: 15px;">
-                        <label for="taskInput">New Task/Work</label>
-                        <textarea id="taskInput" placeholder="e.g., Complete Modern Physics chapter, Solve 50 math problems" rows="2"></textarea>
-                        <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
-                    </div>
-                    <div class="task-display">
-                        <h4 style="margin-bottom: 10px; color: #4c1d95;">Pending Tasks:</h4>
-                        <div id="taskList">
-                            <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="card">
             <h2>📊 Add Test Score</h2>
             <div class="form-grid">
@@ -543,11 +552,55 @@
         </div>
     </div>
 
+    <div id="plannerModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 style="display: flex; justify-content: space-between; align-items: center;">
+                🗓️ Study Planner
+                <button class="btn-delete" style="width: auto; padding: 5px 10px;" onclick="closePlanner()">X Close</button>
+            </h2>
+
+            <div class="calendar-task-layout">
+                
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664;</button>
+                        <h3 id="currentMonthYear"></h3>
+                        <button class="btn-secondary" onclick="changeMonth(1)">&#9654;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-name">Sun</div>
+                        <div class="calendar-day-name">Mon</div>
+                        <div class="calendar-day-name">Tue</div>
+                        <div class="calendar-day-name">Wed</div>
+                        <div class="calendar-day-name">Thu</div>
+                        <div class="calendar-day-name">Fri</div>
+                        <div class="calendar-day-name">Sat</div>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <h3 id="selectedDateTitle">Select a date on the calendar</h3>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="taskInput">New Task/Work</label>
+                        <textarea id="taskInput" placeholder="e.g., Complete Modern Physics chapter, Solve 50 math problems" rows="2"></textarea>
+                        <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
+                    </div>
+                    <div class="task-display">
+                        <h4 style="margin-bottom: 10px; color: #4c1d95;">Pending Tasks:</h4>
+                        <div id="taskList">
+                            <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         let tests = [];
         let chart = null;
 
-        // Calendar variables
         let tasks = {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
@@ -561,6 +614,18 @@
             renderCalendar(); 
             selectDate(new Date().toDateString()); 
         };
+
+        // --- Modal Control Functions (New) ---
+
+        function openPlanner() {
+            document.getElementById('plannerModal').classList.remove('hidden');
+            renderCalendar(); // Ensure calendar is fresh when opened
+            selectDate(selectedDate.toDateString()); // Ensure the right day is selected
+        }
+
+        function closePlanner() {
+            document.getElementById('plannerModal').classList.add('hidden');
+        }
 
         // --- Theme Functions ---
 
@@ -618,7 +683,7 @@
                 return;
             }
 
-            const total = physics + chemistry + chemistry + maths;
+            const total = physics + chemistry + maths; // Corrected calculation to match standard practice P+C+M
             const percentage = (total / totalMarks) * 100;
 
             const test = {
@@ -923,15 +988,13 @@
 
             const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
             let dayCount = 1;
 
-            // Add preceding inactive days from last month
+            // Add preceding days as invisible elements
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day', 'inactive');
-                const prevDay = daysInPrevMonth - firstDayOfMonth + i + 1;
-                dayDiv.textContent = prevDay;
+                dayDiv.textContent = ''; // Hide number
                 grid.appendChild(dayDiv);
             }
 
@@ -949,7 +1012,6 @@
                     dayDiv.classList.add('today');
                 }
 
-                // Apply selection if it matches the current selectedDate
                 if (dateStr === selectedDate.toDateString()) {
                     dayDiv.classList.add('selected');
                 }
@@ -965,14 +1027,14 @@
                 dayCount++;
             }
 
-            // Add succeeding inactive days for next month
-            const cellsNeeded = 42; 
+            // Add succeeding days as invisible elements to maintain grid structure
             const currentCells = grid.children.length;
-            let nextDay = 1;
-            for (let i = 0; i < (cellsNeeded - currentCells); i++) {
+            const cellsNeeded = 7 * Math.ceil(currentCells / 7); // Calculate total cells needed for full rows
+            
+            for (let i = currentCells; i < cellsNeeded; i++) {
                  const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day', 'inactive');
-                dayDiv.textContent = nextDay++;
+                dayDiv.textContent = ''; // Hide number
                 grid.appendChild(dayDiv);
             }
         }
@@ -986,10 +1048,9 @@
                 currentMonth = 11;
                 currentYear--;
             }
-            // Retain the selected day number if possible, or default to the 1st
+            
             const newDate = new Date(currentYear, currentMonth, selectedDate.getDate());
             if (newDate.getMonth() !== currentMonth) {
-                // Day number overflowed (e.g., trying to set day 31 in April)
                 selectedDate = new Date(currentYear, currentMonth, 1);
             } else {
                 selectedDate = newDate;
@@ -999,7 +1060,6 @@
         }
 
         function selectDate(dateStr) {
-            // Un-select previous date in the *entire* calendar, then select the new one
             document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
             const newSelectedDayElement = document.querySelector(`.calendar-day[data-date="${dateStr}"]`);
             if(newSelectedDayElement) {
