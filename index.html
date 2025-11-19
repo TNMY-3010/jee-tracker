@@ -233,11 +233,13 @@
             gap: 5px; 
         }
         
+        /* Ensure textarea takes the space */
         .task-input-form textarea {
             min-height: 80px; 
             resize: vertical;
         }
 
+        /* Ensure the Add Task button aligns properly */
         .task-input-form button {
             align-self: flex-start;
             width: auto !important; 
@@ -333,7 +335,6 @@
     
     <div class="container">
         
-        <!-- HEADER / INFO CARD -->
         <div class="card">
             <h1>🎓 JEE Performance Tracker</h1>
             <p class="subtitle">Track subject scores, monitor progress, and manage your study schedule.</p>
@@ -347,7 +348,6 @@
 
         <div id="statsContainer" class="hidden"></div>
 
-        <!-- ADD TEST SCORE CARD -->
         <div class="card">
             <h2>📊 Add Test Score</h2>
             <div class="form-grid">
@@ -375,7 +375,73 @@
             <button class="btn-primary" onclick="addTest()">Add Test Result</button>
         </div>
 
-        <!-- NEW STUDY LOG CARD -->
+        <div class="card" id="chartCard" style="display: none;">
+            <h2>📈 Performance Trend</h2>
+            <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card" id="tableCard" style="display: none;">
+            <h2>📋 Test History</h2>
+            <div style="overflow-x: auto;">
+                <table id="testTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Physics</th>
+                            <th>Chemistry</th>
+                            <th>Maths</th>
+                            <th>Total</th>
+                            <th>Percentage</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="testTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📅 Study Planner</h2>
+
+            <div class="calendar-task-layout">
+                
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664; Prev</button>
+                        <h3 id="currentMonthYear"></h3>
+                        <button class="btn-secondary" onclick="changeMonth(1)">Next &#9654;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-name">Sun</div>
+                        <div class="calendar-day-name">Mon</div>
+                        <div class="calendar-day-name">Tue</div>
+                        <div class="calendar-day-name">Wed</div>
+                        <div class="calendar-day-name">Thu</div>
+                        <div class="calendar-day-name">Fri</div>
+                        <div class="calendar-day-name">Sat</div>
+                    </div>
+                </div>
+
+                <div class="task-section">
+                    <h3 id="selectedDateTitle">Select a date on the calendar</h3>
+                    
+                    <div class="form-group task-input-form" style="margin-top: 15px;">
+                        <label for="taskInput">New Task/Work</label>
+                        <textarea id="taskInput" placeholder="Make / Add your task here" rows="2"></textarea>
+                        <button class="btn-primary" onclick="addTask()">Add Task</button>
+                    </div>
+
+                    <div class="task-display">
+                        <h4 style="margin-bottom: 10px; color: #63b3ed;">Pending Tasks:</h4>
+                        <div id="taskList">
+                            <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card">
             <h2 style="display: flex; justify-content: space-between;">
                 ⏳ Study Log 
@@ -403,96 +469,16 @@
                 <p class="empty-state" style="padding: 10px; border-top: none;">No study sessions logged yet.</p>
             </div>
         </div>
-        <!-- END NEW STUDY LOG CARD -->
-
-
-        <!-- PERFORMANCE CHARTS CARD -->
-        <div class="card" id="chartCard" style="display: none;">
-            <h2>📈 Performance Trend</h2>
-            <div class="chart-container">
-                <canvas id="trendChart"></canvas>
-            </div>
-        </div>
-
-        <!-- TEST HISTORY CARD -->
-        <div class="card" id="tableCard" style="display: none;">
-            <h2>📋 Test History</h2>
-            <div style="overflow-x: auto;">
-                <table id="testTable">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Physics</th>
-                            <th>Chemistry</th>
-                            <th>Maths</th>
-                            <th>Total</th>
-                            <th>Percentage</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="testTableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- STUDY PLANNER CARD (Minimalist, Bottom-Placed) -->
-        <div class="card">
-            <h2>📅 Study Planner</h2>
-
-            <div class="calendar-task-layout">
-                
-                <!-- 1. Minimalist Calendar -->
-                <div class="calendar-wrapper">
-                    <div class="calendar-header">
-                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664; Prev</button>
-                        <h3 id="currentMonthYear"></h3>
-                        <button class="btn-secondary" onclick="changeMonth(1)">Next &#9654;</button>
-                    </div>
-                    <div class="calendar-grid" id="calendarGrid">
-                        <div class="calendar-day-name">Sun</div>
-                        <div class="calendar-day-name">Mon</div>
-                        <div class="calendar-day-name">Tue</div>
-                        <div class="calendar-day-name">Wed</div>
-                        <div class="calendar-day-name">Thu</div>
-                        <div class="calendar-day-name">Fri</div>
-                        <div class="calendar-day-name">Sat</div>
-                    </div>
-                </div>
-
-                <!-- 2. Task Input & Display Section -->
-                <div class="task-section">
-                    <h3 id="selectedDateTitle">Select a date on the calendar</h3>
-                    
-                    <div class="form-group task-input-form" style="margin-top: 15px;">
-                        <label for="taskInput">New Task/Work</label>
-                        <textarea id="taskInput" placeholder="Make / Add your task here" rows="2"></textarea>
-                        <button class="btn-primary" onclick="addTask()">Add Task</button>
-                    </div>
-
-                    <div class="task-display">
-                        <h4 style="margin-bottom: 10px; color: #63b3ed;">Pending Tasks:</h4>
-                        <div id="taskList">
-                            <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- END STUDY PLANNER CARD -->
-        
-        <!-- FOOTER -->
         <div class="footer">
             Webpage created by <a href="https://github.com/TNMY-3010" target="_blank">Tnmy</a>
         </div>
-        <!-- END FOOTER -->
-
-    </div>
+        </div>
 
 
     <script>
         let tests = [];
         let tasks = {};
-        let studyLogs = []; // NEW: Array for study log entries
+        let studyLogs = []; 
         let chart = null;
 
         let currentMonth = new Date().getMonth();
@@ -502,7 +488,7 @@
         window.onload = function() {
             loadTests();
             loadTasks(); 
-            loadStudyLogs(); // Load new log data
+            loadStudyLogs(); 
             loadTheme();
             updateUI();
             renderCalendar(); 
@@ -538,7 +524,7 @@
             updateChart(); 
         }
 
-        // --- Test Tracker Functions (Unchanged) ---
+        // --- Test Tracker Functions ---
         function loadTests() {
             const saved = localStorage.getItem('jee-tests');
             if (saved) {
@@ -588,7 +574,7 @@
             updateStats();
             updateChart();
             updateTable();
-            renderStudyLogs(); // Update Study Log List and Total
+            renderStudyLogs(); 
         }
         
         function updateStats() {
@@ -725,7 +711,7 @@
                         const importedData = JSON.parse(e.target.result);
                         if (importedData.tests) { tests = importedData.tests; saveTests(); }
                         if (importedData.tasks) { tasks = importedData.tasks; saveTasks(); renderCalendar(); }
-                        if (importedData.studyLogs) { studyLogs = importedData.studyLogs; saveStudyLogs(); } // Import study logs
+                        if (importedData.studyLogs) { studyLogs = importedData.studyLogs; saveStudyLogs(); } 
                         updateUI();
                         alert('Data imported successfully!');
                     } catch (error) {
@@ -736,7 +722,7 @@
             }
         }
 
-        // --- Calendar & Task Functions (Unchanged) ---
+        // --- Calendar & Task Functions ---
         function loadTasks() {
             const savedTasks = localStorage.getItem('jee-tasks');
             if (savedTasks) {
@@ -854,7 +840,7 @@
             }
         }
         
-        // --- NEW Study Log Functions ---
+        // --- Study Log Functions ---
 
         function loadStudyLogs() {
             const savedLogs = localStorage.getItem('jee-study-logs');
@@ -868,7 +854,7 @@
         }
 
         function parseTime(timeString) {
-            // Very simple parser for time strings like "10:00 AM - 1:00 PM"
+            // Simplified logic to find the difference in hours
             const parts = timeString.split('-').map(s => s.trim());
             if (parts.length !== 2) return 0;
 
@@ -879,18 +865,19 @@
                 if (isNaN(h) || isNaN(m)) return 0;
                 
                 if (isPM && h !== 12) h += 12;
-                if (!isPM && h === 12) h = 0; // Midnight 12:00 AM
+                if (!isPM && h === 12) h = 0; 
                 return h * 60 + m; // Total minutes
             };
 
             const startMinutes = parseSingleTime(parts[0]);
-            const endMinutes = parseSingleTime(parts[1]);
+            let endMinutes = parseSingleTime(parts[1]);
 
-            // Handle overnight shifts (e.g., 10 PM - 2 AM) by adding 24 hours to the end time if it's earlier
-            let durationMinutes = endMinutes - startMinutes;
-            if (durationMinutes < 0) {
-                durationMinutes += 24 * 60;
+            // Handle overnight shifts (e.g., 10 PM - 2 AM)
+            if (endMinutes < startMinutes) {
+                endMinutes += 24 * 60;
             }
+            
+            let durationMinutes = endMinutes - startMinutes;
             
             return durationMinutes / 60; // Duration in hours
         }
@@ -906,11 +893,10 @@
             }
             
             const hours = parseTime(time);
+            
             if (hours <= 0 || hours > 12) {
-                // Warning if the time format is unparseable or duration is suspiciously long/zero
-                console.warn(`Could not reliably parse duration from: ${time}. Hours defaulting to 1.`);
-                // We default to 1 hour if parsing fails, but warn the user if it's obviously wrong.
-                if (hours <= 0) alert('Could not calculate a positive duration from the time block. Please check the format (e.g., 10:00 AM - 1:00 PM).');
+                alert('Could not calculate a positive duration from the time block. Please check the format (e.g., 10:00 AM - 1:00 PM) or ensure the duration is reasonable (max 12 hours).');
+                return;
             }
 
             const log = {
@@ -918,11 +904,11 @@
                 date: date,
                 time: time,
                 activity: activity,
-                hours: hours || 1 // Store calculated hours, default to 1 if parsing failed
+                hours: hours 
             };
 
             studyLogs.push(log);
-            studyLogs.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
+            studyLogs.sort((a, b) => new Date(b.date) - new Date(a.date)); 
             saveStudyLogs();
 
             // Clear form
