@@ -17,6 +17,11 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
         }
         
         .container {
@@ -30,12 +35,30 @@
             padding: 25px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        
+        body.dark-mode .card {
+            background: #1e293b;
+            color: #e2e8f0;
         }
         
         h1 {
             color: #4c1d95;
             font-size: 2.5rem;
             margin-bottom: 10px;
+        }
+        
+        body.dark-mode h1 {
+            color: #a78bfa;
+        }
+        
+        h2 {
+            color: #4c1d95;
+        }
+        
+        body.dark-mode h2 {
+            color: #a78bfa;
         }
         
         .subtitle {
@@ -112,12 +135,24 @@
             font-size: 0.9rem;
         }
         
+        body.dark-mode label {
+            color: #cbd5e1;
+        }
+        
         input {
             padding: 10px;
             border: 2px solid #e5e7eb;
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.3s;
+            background: white;
+            color: #1f2937;
+        }
+        
+        body.dark-mode input {
+            background: #334155;
+            border-color: #475569;
+            color: #e2e8f0;
         }
         
         input:focus {
@@ -183,14 +218,28 @@
             border-bottom: 1px solid #e5e7eb;
         }
         
+        body.dark-mode th,
+        body.dark-mode td {
+            border-bottom-color: #475569;
+        }
+        
         th {
             background: #f9fafb;
             font-weight: 600;
             color: #374151;
         }
         
+        body.dark-mode th {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        
         tr:hover {
             background: #f9fafb;
+        }
+        
+        body.dark-mode tr:hover {
+            background: #334155;
         }
         
         .badge {
@@ -231,9 +280,38 @@
         .hidden {
             display: none;
         }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(20deg);
+        }
+        
+        body.dark-mode .theme-toggle {
+            background: #334155;
+        }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+    
     <div class="container">
         <div class="card">
             <h1>🎯 JEE Test Progress Tracker</h1>
@@ -310,8 +388,32 @@
         // Load data on page load
         window.onload = function() {
             loadTests();
+            loadTheme();
             updateUI();
         };
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('jee-theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const toggle = document.getElementById('themeToggle');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                toggle.textContent = '☀️';
+                localStorage.setItem('jee-theme', 'dark');
+            } else {
+                toggle.textContent = '🌙';
+                localStorage.setItem('jee-theme', 'light');
+            }
+        }
 
         function loadTests() {
             const saved = localStorage.getItem('jee-tests');
