@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Test Progress Tracker</title>
+    <title>JEE Performance & Planner</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
+        /* BASE & RESET */
         * {
             margin: 0;
             padding: 0;
@@ -13,186 +14,223 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            /* Official Gradient: Deep Indigo to Royal Blue */
+            background: linear-gradient(135deg, #1e3a8a 0%, #0c1a4e 100%);
             min-height: 100vh;
-            padding: 10px; /* Reduced padding for mobile */
-            transition: background 0.3s ease;
+            padding: 20px 10px; 
+            color: #d1d5db; /* Light text for dark background */
+            transition: background 0.5s ease, color 0.5s ease;
         }
         
-        body.dark-mode {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        body.light-mode {
+            /* Official Light Gradient: Soft Blue to White */
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 100%);
+            color: #1f2937;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
         }
         
         .card {
+            background: rgba(255, 255, 255, 0.05); /* Slightly transparent dark card */
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px); /* Soft blur effect */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s ease;
+        }
+        
+        body.light-mode .card {
             background: white;
-            border-radius: 15px;
-            padding: 20px; /* Reduced padding for mobile */
-            margin-bottom: 15px; /* Reduced margin for mobile */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: background 0.3s ease, color 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
         }
         
-        body.dark-mode .card {
-            background: #1e293b;
-            color: #e2e8f0;
-        }
-        
+        /* TYPOGRAPHY */
         h1 {
-            color: #4c1d95;
-            font-size: 2rem; /* Reduced size for mobile */
-            margin-bottom: 10px;
+            color: #fcd34d; /* Gold/Yellow Accent */
+            font-size: 2.2rem; 
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
         
-        body.dark-mode h1 {
-            color: #a78bfa;
+        body.light-mode h1 {
+            color: #1e40af; /* Deep Blue in light mode */
         }
         
         h2 {
-            color: #4c1d95;
-            font-size: 1.5rem;
+            color: #63b3ed; /* Light Blue Accent */
+            font-size: 1.6rem;
             margin-bottom: 15px; 
         }
         
-        body.dark-mode h2 {
-            color: #a78bfa;
+        body.light-mode h2 {
+            color: #1e40af;
         }
-        
+
         .subtitle {
-            color: #6b7280;
-            margin-bottom: 15px;
+            color: #9ca3af;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
         }
         
+        body.light-mode .subtitle {
+            color: #6b7280;
+        }
+
+        /* STATS GRID */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adjusted min width for mobile */
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
         
         .stat-card {
-            padding: 15px; /* Smaller padding */
-            border-radius: 12px;
+            padding: 15px; 
+            border-radius: 10px;
             color: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
         }
-        
-        /* (Stat card colors and rest of forms/tables CSS kept the same) */
 
-        .stat-label {
-            font-size: 0.8rem;
-            opacity: 0.9;
-            margin-bottom: 8px;
+        .stat-card:hover {
+            transform: translateY(-3px); /* Hover Animation */
         }
         
-        .stat-value {
-            font-size: 1.5rem; /* Smaller font */
-            font-weight: bold;
-        }
+        .stat-card.green { background: linear-gradient(45deg, #10b981, #059669); }
+        .stat-card.blue { background: linear-gradient(45deg, #3b82f6, #2563eb); }
+        .stat-card.purple { background: linear-gradient(45deg, #8b5cf6, #7c3aed); }
+        .stat-card.orange { background: linear-gradient(45deg, #f59e0b, #d97706); }
         
-        .stat-sub {
-            font-size: 0.75rem;
-            opacity: 0.85;
-            margin-top: 3px;
-        }
+        .stat-label { font-size: 0.8rem; opacity: 0.9; margin-bottom: 8px; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; }
+        .stat-sub { font-size: 0.75rem; opacity: 0.85; margin-top: 3px; }
         
+        /* FORMS */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
         }
         
-        /* Button Styles */
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+        
+        body.light-mode label { color: #374151; }
+        
+        input, textarea {
+            padding: 10px;
+            border: 2px solid #374151;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #1f2937;
+            color: #e5e7eb;
+            transition: all 0.3s;
+        }
+        
+        body.light-mode input, body.light-mode textarea {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            color: #1f2937;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #fcd34d; /* Gold focus border */
+            box-shadow: 0 0 5px rgba(252, 211, 77, 0.5);
+        }
+        
+        /* BUTTONS */
         button {
-            padding: 10px 20px; /* Adjusted padding */
+            padding: 10px 20px;
             border: none;
-            border-radius: 8px;
-            font-size: 0.9rem; /* Adjusted font size */
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
         }
         
         .btn-primary {
-            /* Kept same */
+            background: linear-gradient(45deg, #3b82f6, #6366f1);
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #6366f1, #3b82f6);
+            transform: translateY(-2px);
         }
 
         .btn-secondary {
-            /* Kept same */
+            background: #374151;
+            color: #e5e7eb;
+            box-shadow: none;
         }
-
-        .btn-export, .btn-import {
-             padding: 10px;
-             font-size: 0.8rem;
+        .btn-secondary:hover {
+            background: #4b5563;
         }
         
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
+        .btn-export { background: #0d9488; color: white; } /* Teal */
+        .btn-import { background: #fcd34d; color: #1f2937; } /* Gold */
+        .btn-delete { background: #ef4444; color: white; padding: 8px 16px; font-size: 0.85rem; }
+        
+        .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
+
+        /* CHART & TABLE */
+        .chart-container { position: relative; height: 300px; margin: 20px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #374151; }
+        body.light-mode th, body.light-mode td { border-bottom-color: #e5e7eb; }
+        
+        th { background: rgba(55, 65, 81, 0.5); font-weight: 600; color: #fcd34d; }
+        body.light-mode th { background: #f3f4f6; color: #1e40af; }
+        
+        tr:hover { background: rgba(55, 65, 81, 0.3); }
+        body.light-mode tr:hover { background: #f9fafb; }
+        
+        .badge-green { background: #10b981; color: white; }
+        .badge-yellow { background: #fcd34d; color: #1f2937; }
+        .badge-red { background: #ef4444; color: white; }
         
         /* CALENDAR LAYOUT & RESPONSIVENESS */
-
         .calendar-task-layout {
             display: flex;
-            flex-direction: column; /* Stacked columns by default for mobile */
+            flex-direction: column; 
             gap: 20px;
             padding-top: 10px;
         }
         
-        .calendar-wrapper {
-            max-width: 100%; /* Take full width on mobile */
-            flex-shrink: 0;
-        }
-
-        .task-section {
-             flex-grow: 1;
-        }
+        .calendar-wrapper { max-width: 100%; flex-shrink: 0; }
+        .task-section { flex-grow: 1; }
 
         @media (min-width: 768px) {
-            .calendar-task-layout {
-                flex-direction: row; /* Side-by-side on desktop */
-            }
-            .calendar-wrapper {
-                max-width: 320px; /* Max width constraint on desktop */
-            }
+            .calendar-task-layout { flex-direction: row; }
+            .calendar-wrapper { max-width: 320px; }
         }
         
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .calendar-header h3 {
-            margin: 0;
-            color: #4c1d95;
-            font-size: 1.2rem;
-        }
-        body.dark-mode .calendar-header h3 {
-            color: #a78bfa;
-        }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
+            gap: 1px; /* Smaller gap */
             text-align: center;
             font-size: 0.9rem;
         }
-        .calendar-day-name {
-            font-weight: 700;
-            color: #6b7280;
-            padding: 8px 0;
-        }
-        body.dark-mode .calendar-day-name {
-            color: #9ca3af;
-        }
+        .calendar-day-name { font-weight: 700; color: #fcd34d; padding: 8px 0; }
+        body.light-mode .calendar-day-name { color: #1e40af; }
+
         .calendar-day {
             padding: 8px 0px;
             border-radius: 4px; 
@@ -202,14 +240,16 @@
             line-height: 1;
         }
 
-        /* Hide dates outside current month */
-        .calendar-day.inactive {
-            visibility: hidden; 
-            pointer-events: none;
-        }
+        .calendar-day.inactive { visibility: hidden; pointer-events: none; }
+        .calendar-day:hover { background-color: rgba(252, 211, 77, 0.1); }
         
+        .calendar-day.today {
+            background-color: rgba(59, 130, 246, 0.2); 
+            border: 1px solid #3b82f6;
+            font-weight: 600;
+        }
         .calendar-day.selected {
-            background-color: #6366f1;
+            background-color: #3b82f6;
             color: white;
             font-weight: 700;
         }
@@ -221,18 +261,10 @@
             transform: translateX(-50%);
             width: 4px;
             height: 4px; 
-            background-color: #ef4444; 
+            background-color: #10b981; /* Teal dot for task */
             border-radius: 50%;
         }
 
-        .task-display {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #e5e7eb;
-        }
-        body.dark-mode .task-display {
-            border-top-color: #475569;
-        }
         .task-item {
             display: flex;
             justify-content: space-between;
@@ -240,29 +272,33 @@
             padding: 10px;
             border-radius: 6px;
             margin-bottom: 8px;
-            background-color: #f9fafb;
+            background: rgba(55, 65, 81, 0.5); /* Dark background for task item */
+            transition: background 0.3s ease;
         }
-        body.dark-mode .task-item {
-            background-color: #334155;
-        }
-        
-        /* Table styles adjusted for mobile scrolling */
-        table {
-            width: 100%;
-            min-width: 600px; /* Ensure table is wide enough for data */
+        body.light-mode .task-item {
+            background: #f3f4f6;
+            color: #1f2937;
         }
         
+        /* THEME TOGGLE */
         .theme-toggle {
+            position: fixed;
             top: 10px;
             right: 10px;
             width: 50px;
             height: 50px;
+            border-radius: 50%;
+            background: #fcd34d;
+            color: #1f2937;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             font-size: 1.2rem;
+            z-index: 1000;
         }
-
-        /* Additional styles */
-        .hidden { display: none; }
-        input, textarea { width: 100%; }
+        
+        body.light-mode .theme-toggle {
+            background: #1f2937;
+            color: #fcd34d;
+        }
         
     </style>
 </head>
@@ -272,11 +308,11 @@
     <div class="container">
         
         <div class="card">
-            <h1>🎯 JEE Progress Tracker</h1>
-            <p class="subtitle">Track your performance and study plan.</p>
+            <h1>🎓 JEE Performance Tracker</h1>
+            <p class="subtitle">Track subject scores, monitor progress, and manage your study schedule.</p>
             
             <div class="button-group">
-                <button class="btn-export" onclick="exportData()">📥 Export Data</button>
+                <button class="btn-export" onclick="exportData()">📥 Export All Data</button>
                 <button class="btn-import" onclick="document.getElementById('importFile').click()">📤 Import Data</button>
                 <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display: none;">
             </div>
@@ -304,7 +340,7 @@
                     <input type="number" id="maths" step="0.01" placeholder="0" required>
                 </div>
                 <div class="form-group">
-                    <label>Total Marks</label>
+                    <label>Total Marks (Default: 300)</label>
                     <input type="number" id="totalMarks" value="300" required>
                 </div>
             </div>
@@ -345,9 +381,9 @@
                 
                 <div class="calendar-wrapper">
                     <div class="calendar-header">
-                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664;</button>
+                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664; Prev</button>
                         <h3 id="currentMonthYear"></h3>
-                        <button class="btn-secondary" onclick="changeMonth(1)">&#9654;</button>
+                        <button class="btn-secondary" onclick="changeMonth(1)">Next &#9654;</button>
                     </div>
                     <div class="calendar-grid" id="calendarGrid">
                         <div class="calendar-day-name">Sun</div>
@@ -364,11 +400,11 @@
                     <h3 id="selectedDateTitle">Select a date on the calendar</h3>
                     <div class="form-group" style="margin-top: 15px;">
                         <label for="taskInput">New Task/Work</label>
-                        <textarea id="taskInput" placeholder="e.g., Complete Modern Physics chapter, Solve 50 math problems" rows="2"></textarea>
+                        <textarea id="taskInput" placeholder="E.g., Complete Modern Physics chapter, Make your task here" rows="2"></textarea>
                         <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
                     </div>
                     <div class="task-display">
-                        <h4 style="margin-bottom: 10px; color: #4c1d95;">Pending Tasks:</h4>
+                        <h4 style="margin-bottom: 10px; color: #63b3ed;">Pending Tasks:</h4>
                         <div id="taskList">
                             <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
                         </div>
@@ -401,24 +437,26 @@
 
         function loadTheme() {
             const savedTheme = localStorage.getItem('jee-theme');
-            if (savedTheme === 'dark') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('themeToggle').textContent = '☀️';
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('themeToggle').textContent = '🌙';
             }
+            // Fix chart colors on load
+            updateChart(); 
         }
 
         function toggleTheme() {
             const body = document.body;
             const toggle = document.getElementById('themeToggle');
             
-            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
             
-            if (body.classList.contains('dark-mode')) {
-                toggle.textContent = '☀️';
-                localStorage.setItem('jee-theme', 'dark');
-            } else {
+            if (body.classList.contains('light-mode')) {
                 toggle.textContent = '🌙';
                 localStorage.setItem('jee-theme', 'light');
+            } else {
+                toggle.textContent = '☀️';
+                localStorage.setItem('jee-theme', 'dark');
             }
             updateChart(); 
         }
@@ -565,9 +603,9 @@
 
             const labels = tests.map(t => new Date(t.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' }));
             
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = isDarkMode ? '#e2e8f0' : '#4b5563';
-            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const isLightMode = document.body.classList.contains('light-mode');
+            const textColor = isLightMode ? '#1f2937' : '#e5e7eb';
+            const gridColor = isLightMode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
 
             chart = new Chart(ctx, {
                 type: 'line',
@@ -593,16 +631,16 @@
                         {
                             label: 'Chemistry',
                             data: tests.map(t => t.chemistry),
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: '#0d9488', /* Teal */
+                            backgroundColor: 'rgba(13, 148, 136, 0.1)',
                             borderWidth: 2,
                             tension: 0.4
                         },
                         {
                             label: 'Maths',
                             data: tests.map(t => t.maths),
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderColor: '#fcd34d', /* Gold */
+                            backgroundColor: 'rgba(252, 211, 77, 0.1)',
                             borderWidth: 2,
                             tension: 0.4
                         }
@@ -670,8 +708,8 @@
                     <tr>
                         <td>${new Date(test.date).toLocaleDateString('en-GB')}</td>
                         <td style="color: #3b82f6; font-weight: 600;">${test.physics.toFixed(2)}</td>
-                        <td style="color: #10b981; font-weight: 600;">${test.chemistry.toFixed(2)}</td>
-                        <td style="color: #f59e0b; font-weight: 600;">${test.maths.toFixed(2)}</td>
+                        <td style="color: #0d9488; font-weight: 600;">${test.chemistry.toFixed(2)}</td>
+                        <td style="color: #fcd34d; font-weight: 600;">${test.maths.toFixed(2)}</td>
                         <td style="font-weight: bold;">${test.total.toFixed(2)}/${test.totalMarks}</td>
                         <td><span class="badge ${badgeClass}">${test.percentage.toFixed(2)}%</span></td>
                         <td><button class="btn-delete" onclick="deleteTest(${test.id})">Delete</button></td>
@@ -783,8 +821,11 @@
                 }
 
                 if (dateStr === selectedDate.toDateString()) {
-                    document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
-                    dayDiv.classList.add('selected');
+                    // Check if it's already selected and if so, don't double select
+                    if (!dayDiv.classList.contains('selected')) {
+                        document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+                        dayDiv.classList.add('selected');
+                    }
                 }
 
                 // Add task dot 
@@ -831,7 +872,6 @@
         }
 
         function selectDate(dateStr) {
-            // Un-select only the visible selected day in the *current* grid
             document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
             
             const newSelectedDayElement = document.querySelector(`.calendar-day[data-date="${dateStr}"]`);
