@@ -82,7 +82,7 @@
 
         /* STOPWATCH SPECIFIC STYLES */
         .stopwatch-display {
-            font-size: 2.5rem; /* Slightly reduced */
+            font-size: 2.5rem; 
             font-weight: 700;
             text-align: center;
             color: #fcd34d;
@@ -106,7 +106,7 @@
         /* CALENDAR LAYOUT & RESPONSIVENESS (FIXED) */
         .calendar-task-layout {
             display: flex;
-            flex-direction: column; /* Always stack on mobile */
+            flex-direction: column; 
             gap: 20px;
             padding-top: 10px;
         }
@@ -116,7 +116,7 @@
 
         @media (min-width: 768px) {
             .calendar-task-layout { 
-                flex-direction: row; /* Side-by-side on desktop */
+                flex-direction: row; 
                 align-items: flex-start; 
             }
             .calendar-wrapper { max-width: 320px; }
@@ -145,12 +145,15 @@
             padding: 10px 15px;
             display: flex;
             flex-direction: column; 
+            background: rgba(55, 65, 81, 0.3); /* Ensure log entries look good */
+            border-radius: 6px;
+            margin-bottom: 8px;
         }
         @media (min-width: 768px) {
             .log-entry { flex-direction: row; justify-content: space-between; align-items: center; }
         }
 
-        /* FOOTER STYLES */
+        /* Footer */
         .footer { text-align: center; padding: 15px 0 10px 0; font-size: 0.8rem; color: #6b7280; transition: color 0.5s ease; }
         .footer a { color: #fcd34d; text-decoration: none; font-weight: 700; transition: color 0.3s ease; }
         body.light-mode .footer a { color: #1e40af; }
@@ -745,7 +748,8 @@
             const log = { id: Date.now(), date, time, activity, hours };
 
             studyLogs.push(log);
-            studyLogs.sort((a, b) => new Date(b.date) - new Date(a.date)); 
+            // FIX: Sort chronologically (Oldest first)
+            studyLogs.sort((a, b) => new Date(a.date) - new Date(b.date)); 
             saveStudyLogs();
 
             document.getElementById('logDate').value = '';
