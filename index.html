@@ -136,7 +136,7 @@
             background: #1f2937;
             color: #e5e7eb;
             transition: all 0.3s;
-            width: 100%; /* Ensure inputs take full width of their container */
+            width: 100%; 
         }
         
         body.light-mode input, body.light-mode textarea {
@@ -147,7 +147,7 @@
         
         input:focus, textarea:focus {
             outline: none;
-            border-color: #fcd34d; /* Gold focus border */
+            border-color: #fcd34d; 
             box-shadow: 0 0 5px rgba(252, 211, 77, 0.5);
         }
         
@@ -183,8 +183,8 @@
             background: #4b5563;
         }
         
-        .btn-export { background: #0d9488; color: white; } /* Teal */
-        .btn-import { background: #fcd34d; color: #1f2937; } /* Gold */
+        .btn-export { background: #0d9488; color: white; } 
+        .btn-import { background: #fcd34d; color: #1f2937; } 
         .btn-delete { background: #ef4444; color: white; padding: 8px 16px; font-size: 0.85rem; }
         
         .button-group { display: flex; gap: 10px; margin-bottom: 15px; }
@@ -205,7 +205,7 @@
         .badge-yellow { background: #fcd34d; color: #1f2937; }
         .badge-red { background: #ef4444; color: white; }
         
-        /* CALENDAR LAYOUT & RESPONSIVENESS FIXES */
+        /* CALENDAR LAYOUT & RESPONSIVENESS */
         .calendar-task-layout {
             display: flex;
             flex-direction: column; 
@@ -219,7 +219,7 @@
         @media (min-width: 768px) {
             .calendar-task-layout { 
                 flex-direction: row; 
-                align-items: flex-start; /* Align calendar and tasks to the top */
+                align-items: flex-start; 
             }
             .calendar-wrapper { max-width: 320px; }
         }
@@ -230,21 +230,21 @@
         .task-input-form {
             display: flex;
             flex-direction: column;
-            gap: 5px; /* Added small gap between label, textarea, and button */
+            gap: 5px; 
         }
         
         /* Ensure textarea takes the space */
         .task-input-form textarea {
-            min-height: 80px; /* Set a minimum height */
+            min-height: 80px; 
             resize: vertical;
         }
 
         /* Ensure the Add Task button aligns properly */
         .task-input-form button {
             align-self: flex-start;
-            width: auto !important; /* Override the 100% width often applied to .btn-primary */
+            width: auto !important; 
             margin-top: 0;
-            padding: 8px 15px; /* Slightly smaller button for better fitting */
+            padding: 8px 15px; 
         }
 
 
@@ -255,8 +255,6 @@
             text-align: center;
             font-size: 0.9rem;
         }
-        /* ... (rest of calendar styles remain the same) */
-
         .calendar-day-name { font-weight: 700; color: #fcd34d; padding: 8px 0; }
         body.light-mode .calendar-day-name { color: #1e40af; }
         .calendar-day { padding: 8px 0px; border-radius: 4px; cursor: pointer; transition: all 0.2s; position: relative; line-height: 1; }
@@ -282,7 +280,7 @@
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">☀️</button>
     
     <div class="container">
         
@@ -380,7 +378,7 @@
                     
                     <div class="form-group task-input-form" style="margin-top: 15px;">
                         <label for="taskInput">New Task/Work</label>
-                        <textarea id="taskInput" placeholder="E.g., Complete Modern Physics chapter, make your task here" rows="2"></textarea>
+                        <textarea id="taskInput" placeholder="Make / Add your task here" rows="2"></textarea>
                         <button class="btn-primary" onclick="addTask()">Add Task</button>
                     </div>
 
