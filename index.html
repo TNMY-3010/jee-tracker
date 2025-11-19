@@ -55,7 +55,7 @@
         
         h2 {
             color: #4c1d95;
-            margin-bottom: 15px; /* Added margin for separation */
+            margin-bottom: 15px; 
         }
         
         body.dark-mode h2 {
@@ -317,7 +317,18 @@
             background: #334155;
         }
 
-        /* CALENDAR STYLES */
+        /* NEW CALENDAR STYLES (Minimalist) */
+        .calendar-container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .calendar-wrapper {
+            max-width: 320px; /* Reduced max width for minimal size */
+            flex-shrink: 0;
+            padding-bottom: 15px;
+        }
+        
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -327,6 +338,7 @@
         .calendar-header h3 {
             margin: 0;
             color: #4c1d95;
+            font-size: 1.2rem;
         }
         body.dark-mode .calendar-header h3 {
             color: #a78bfa;
@@ -334,26 +346,28 @@
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 2px; /* Reduced gap */
             text-align: center;
+            font-size: 0.9rem;
         }
         .calendar-day-name {
             font-weight: 700;
             color: #6b7280;
-            padding: 10px 0;
+            padding: 8px 0;
         }
         body.dark-mode .calendar-day-name {
             color: #9ca3af;
         }
         .calendar-day {
-            padding: 10px 5px;
-            border-radius: 8px;
+            padding: 8px 0px;
+            border-radius: 4px; /* Slightly smaller borders */
             cursor: pointer;
             transition: background-color 0.2s;
             position: relative;
+            line-height: 1; /* Tighter spacing */
         }
         .calendar-day:hover {
-            background-color: #f3f4f6;
+            background-color: #e5e7eb;
         }
         body.dark-mode .calendar-day:hover {
             background-color: #334155;
@@ -374,21 +388,26 @@
         .calendar-day.selected {
             background-color: #6366f1;
             color: white;
+            font-weight: 700;
         }
         .task-dot {
             position: absolute;
-            bottom: 5px;
+            bottom: 2px; /* Moved down */
             left: 50%;
             transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            background-color: #ef4444; /* Red for task */
+            width: 4px; /* Smaller dot */
+            height: 4px; 
+            background-color: #ef4444; 
             border-radius: 50%;
         }
 
-        /* Task Modal/Display */
+        /* NEW TASK DISPLAY STYLES (Separate Section) */
+        .task-input-section {
+            flex-grow: 1;
+        }
+
         .task-display {
-            margin-top: 20px;
+            margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #e5e7eb;
         }
@@ -410,6 +429,7 @@
         .task-item span {
             font-weight: 500;
             flex-grow: 1;
+            margin-right: 10px;
         }
         
     </style>
@@ -433,31 +453,38 @@
 
         <div class="card">
             <h2>📅 Study Planner</h2>
-            <div class="calendar-header">
-                <button class="btn-secondary" onclick="changeMonth(-1)">&#9664; Prev</button>
-                <h3 id="currentMonthYear"></h3>
-                <button class="btn-secondary" onclick="changeMonth(1)">Next &#9654;</button>
-            </div>
-            <div class="calendar-grid" id="calendarGrid">
-                <div class="calendar-day-name">Sun</div>
-                <div class="calendar-day-name">Mon</div>
-                <div class="calendar-day-name">Tue</div>
-                <div class="calendar-day-name">Wed</div>
-                <div class="calendar-day-name">Thu</div>
-                <div class="calendar-day-name">Fri</div>
-                <div class="calendar-day-name">Sat</div>
-            </div>
-
-            <div class="task-display">
-                <h3 id="selectedDateTitle">Select a date to add a task</h3>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="taskInput">New Task/Work</label>
-                    <textarea id="taskInput" placeholder="e.g., Complete Modern Physics chapter, Solve 50 math problems" rows="2"></textarea>
-                    <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
+            <div class="calendar-container">
+                
+                <div class="calendar-wrapper">
+                    <div class="calendar-header">
+                        <button class="btn-secondary" onclick="changeMonth(-1)">&#9664;</button>
+                        <h3 id="currentMonthYear"></h3>
+                        <button class="btn-secondary" onclick="changeMonth(1)">&#9654;</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <div class="calendar-day-name">Sun</div>
+                        <div class="calendar-day-name">Mon</div>
+                        <div class="calendar-day-name">Tue</div>
+                        <div class="calendar-day-name">Wed</div>
+                        <div class="calendar-day-name">Thu</div>
+                        <div class="calendar-day-name">Fri</div>
+                        <div class="calendar-day-name">Sat</div>
+                    </div>
                 </div>
-                <h4 style="margin-top: 20px; color: #4c1d95;">Tasks:</h4>
-                <div id="taskList">
-                    <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
+
+                <div class="task-input-section">
+                    <h3 id="selectedDateTitle">Select a date to manage tasks</h3>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label for="taskInput">New Task/Work</label>
+                        <textarea id="taskInput" placeholder="e.g., Complete Modern Physics chapter, Solve 50 math problems" rows="2"></textarea>
+                        <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
+                    </div>
+                    <div class="task-display">
+                        <h4 style="margin-bottom: 10px; color: #4c1d95;">Pending Tasks:</h4>
+                        <div id="taskList">
+                            <p class="empty-state" style="padding: 10px; margin-top: 10px; border-top: none;">No tasks for this date.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -524,20 +551,18 @@
         let tasks = {};
         let currentMonth = new Date().getMonth();
         let currentYear = new Date().getFullYear();
-        let selectedDate = new Date(); // Stores the currently selected day
-        let isTaskSectionInitialized = false; // Flag to prevent re-initializing the task view elements
+        let selectedDate = new Date(); 
         
-        // Load data on page load
         window.onload = function() {
             loadTests();
-            loadTasks(); // Load calendar tasks
+            loadTasks(); 
             loadTheme();
             updateUI();
-            renderCalendar(); // Initial calendar render
-            selectDate(new Date().toDateString()); // Select today on load
+            renderCalendar(); 
+            selectDate(new Date().toDateString()); 
         };
 
-        // --- Theme Functions (Existing) ---
+        // --- Theme Functions ---
 
         function loadTheme() {
             const savedTheme = localStorage.getItem('jee-theme');
@@ -560,11 +585,10 @@
                 toggle.textContent = '🌙';
                 localStorage.setItem('jee-theme', 'light');
             }
-            // Re-render chart to pick up theme changes
             updateChart(); 
         }
 
-        // --- Test Tracker Functions (Existing) ---
+        // --- Test Tracker Functions ---
 
         function loadTests() {
             const saved = localStorage.getItem('jee-tests');
@@ -612,7 +636,6 @@
             tests.sort((a, b) => new Date(a.date) - new Date(b.date));
             saveTests();
 
-            // Clear form
             document.getElementById('testDate').value = '';
             document.getElementById('physics').value = '';
             document.getElementById('chemistry').value = '';
@@ -646,12 +669,11 @@
             const previous = tests.length > 1 ? tests[tests.length - 2] : null;
             const avgPercentage = tests.reduce((sum, t) => sum + t.percentage, 0) / tests.length;
             
-            // Handle case where previous score is zero to avoid division by zero
             let progressChange = 0;
             if (previous && previous.total > 0) {
                 progressChange = ((latest.total - previous.total) / previous.total) * 100;
             } else if (previous && previous.total === 0 && latest.total > 0) {
-                 progressChange = 100; // Treat as 100% improvement if previous was 0
+                 progressChange = 100; 
             } else if (!previous) {
                 progressChange = 0;
             }
@@ -759,7 +781,7 @@
                             display: true,
                             position: 'top',
                             labels: {
-                                color: textColor // Apply color to legend labels
+                                color: textColor 
                             }
                         }
                     },
@@ -823,7 +845,7 @@
             }).join('');
         }
         
-        // --- Data Import/Export Functions (Existing, now handles tasks too) ---
+        // --- Data Import/Export Functions ---
 
         function exportData() {
             const exportObject = {
@@ -866,7 +888,7 @@
             }
         }
 
-        // --- NEW Calendar & Task Functions ---
+        // --- Calendar & Task Functions ---
 
         function loadTasks() {
             const savedTasks = localStorage.getItem('jee-tasks');
@@ -889,7 +911,6 @@
             const grid = document.getElementById('calendarGrid');
             const header = document.getElementById('currentMonthYear');
             
-            // Clear all days, keeping the day names (first 7 elements)
             while (grid.children.length > 7) {
                 grid.removeChild(grid.lastChild);
             }
@@ -898,16 +919,14 @@
                 "July", "August", "September", "October", "November", "December"
             ];
 
-            // 1. Set Header
             header.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
-            // 2. Determine first day and total days
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); // 0 (Sun) - 6 (Sat)
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay(); 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
             let dayCount = 1;
 
-            // 3. Add preceding inactive days from last month
+            // Add preceding inactive days from last month
             for (let i = 0; i < firstDayOfMonth; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day', 'inactive');
@@ -916,7 +935,7 @@
                 grid.appendChild(dayDiv);
             }
 
-            // 4. Add active days for the current month
+            // Add active days for the current month
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day');
@@ -926,19 +945,16 @@
                 dayDiv.setAttribute('data-date', dateStr);
                 dayDiv.onclick = () => selectDate(dateStr);
                 
-                // Highlight Today
                 if (i === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
                     dayDiv.classList.add('today');
                 }
 
-                // Highlight Selected Date
+                // Apply selection if it matches the current selectedDate
                 if (dateStr === selectedDate.toDateString()) {
-                    // Remove previous selection highlight
-                    document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
                     dayDiv.classList.add('selected');
                 }
 
-                // Add task dot if tasks exist for this date
+                // Add task dot 
                 if (tasks[dateStr] && tasks[dateStr].length > 0) {
                     const dot = document.createElement('span');
                     dot.classList.add('task-dot');
@@ -949,15 +965,15 @@
                 dayCount++;
             }
 
-            // 5. Add succeeding inactive days for next month
-            const remainingCells = 42 - (firstDayOfMonth + daysInMonth); // 6 rows * 7 days
+            // Add succeeding inactive days for next month
+            const cellsNeeded = 42; 
+            const currentCells = grid.children.length;
             let nextDay = 1;
-            for (let i = 0; i < remainingCells && dayCount <= 42; i++) {
+            for (let i = 0; i < (cellsNeeded - currentCells); i++) {
                  const dayDiv = document.createElement('div');
                 dayDiv.classList.add('calendar-day', 'inactive');
                 dayDiv.textContent = nextDay++;
                 grid.appendChild(dayDiv);
-                dayCount++;
             }
         }
 
@@ -970,14 +986,21 @@
                 currentMonth = 11;
                 currentYear--;
             }
+            // Retain the selected day number if possible, or default to the 1st
+            const newDate = new Date(currentYear, currentMonth, selectedDate.getDate());
+            if (newDate.getMonth() !== currentMonth) {
+                // Day number overflowed (e.g., trying to set day 31 in April)
+                selectedDate = new Date(currentYear, currentMonth, 1);
+            } else {
+                selectedDate = newDate;
+            }
             renderCalendar();
+            selectDate(selectedDate.toDateString());
         }
 
         function selectDate(dateStr) {
-            // Un-select previous date in the current view
+            // Un-select previous date in the *entire* calendar, then select the new one
             document.querySelectorAll('.calendar-day').forEach(el => el.classList.remove('selected'));
-
-            // Select new date
             const newSelectedDayElement = document.querySelector(`.calendar-day[data-date="${dateStr}"]`);
             if(newSelectedDayElement) {
                 newSelectedDayElement.classList.add('selected');
@@ -1025,7 +1048,7 @@
                 taskInput.value = '';
                 saveTasks();
                 renderTasks();
-                renderCalendar(); // Re-render calendar to show the task dot
+                renderCalendar(); 
             } else {
                 alert('Please enter a task description.');
             }
@@ -1036,11 +1059,11 @@
             if (tasks[dateKey]) {
                 tasks[dateKey] = tasks[dateKey].filter(task => task.id !== id);
                 if (tasks[dateKey].length === 0) {
-                    delete tasks[dateKey]; // Clean up empty array
+                    delete tasks[dateKey]; 
                 }
                 saveTasks();
                 renderTasks();
-                renderCalendar(); // Re-render calendar to remove the task dot if list is empty
+                renderCalendar(); 
             }
         }
     </script>
