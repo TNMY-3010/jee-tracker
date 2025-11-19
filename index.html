@@ -278,12 +278,12 @@
         
         .hidden { display: none; }
 
-        /* FOOTER STYLES */
+        /* FOOTER STYLES (Improved Visibility) */
         .footer {
             text-align: center;
             padding: 15px 0 10px 0;
-            font-size: 0.75rem;
-            color: #4b5563; /* Subtle gray color */
+            font-size: 0.8rem; /* Slightly larger text */
+            color: #6b7280; /* Better visibility in dark mode */
             transition: color 0.5s ease;
         }
 
@@ -292,10 +292,16 @@
         }
 
         .footer a {
-            color: inherit;
+            color: #fcd34d; /* Use gold accent for the link */
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            transition: color 0.3s ease;
         }
+        
+        body.light-mode .footer a {
+             color: #1e40af; /* Deep blue in light mode */
+        }
+        
     </style>
 </head>
 <body>
@@ -303,6 +309,7 @@
     
     <div class="container">
         
+        <!-- HEADER / INFO CARD -->
         <div class="card">
             <h1>🎓 JEE Performance Tracker</h1>
             <p class="subtitle">Track subject scores, monitor progress, and manage your study schedule.</p>
@@ -316,6 +323,7 @@
 
         <div id="statsContainer" class="hidden"></div>
 
+        <!-- ADD TEST SCORE CARD -->
         <div class="card">
             <h2>📊 Add Test Score</h2>
             <div class="form-grid">
@@ -343,6 +351,7 @@
             <button class="btn-primary" onclick="addTest()">Add Test Result</button>
         </div>
 
+        <!-- PERFORMANCE CHARTS CARD -->
         <div class="card" id="chartCard" style="display: none;">
             <h2>📈 Performance Trend</h2>
             <div class="chart-container">
@@ -350,6 +359,7 @@
             </div>
         </div>
 
+        <!-- TEST HISTORY CARD -->
         <div class="card" id="tableCard" style="display: none;">
             <h2>📋 Test History</h2>
             <div style="overflow-x: auto;">
@@ -370,11 +380,13 @@
             </div>
         </div>
 
+        <!-- STUDY PLANNER CARD (Minimalist, Bottom-Placed) -->
         <div class="card">
             <h2>📅 Study Planner</h2>
 
             <div class="calendar-task-layout">
                 
+                <!-- 1. Minimalist Calendar -->
                 <div class="calendar-wrapper">
                     <div class="calendar-header">
                         <button class="btn-secondary" onclick="changeMonth(-1)">&#9664; Prev</button>
@@ -392,6 +404,7 @@
                     </div>
                 </div>
 
+                <!-- 2. Task Input & Display Section -->
                 <div class="task-section">
                     <h3 id="selectedDateTitle">Select a date on the calendar</h3>
                     
@@ -410,10 +423,15 @@
                 </div>
             </div>
         </div>
+        <!-- END STUDY PLANNER CARD -->
+        
+        <!-- NEW FOOTER -->
         <div class="footer">
-            Webpage created by <a href="#">Tnmy</a>
+            Webpage created by <a href="https://github.com/TNMY-3010" target="_blank">Tnmy</a>
         </div>
-        </div>
+        <!-- END NEW FOOTER -->
+
+    </div>
 
 
     <script>
