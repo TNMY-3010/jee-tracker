@@ -136,6 +136,7 @@
             background: #1f2937;
             color: #e5e7eb;
             transition: all 0.3s;
+            width: 100%; /* Ensure inputs take full width of their container */
         }
         
         body.light-mode input, body.light-mode textarea {
@@ -204,7 +205,7 @@
         .badge-yellow { background: #fcd34d; color: #1f2937; }
         .badge-red { background: #ef4444; color: white; }
         
-        /* CALENDAR LAYOUT & RESPONSIVENESS */
+        /* CALENDAR LAYOUT & RESPONSIVENESS FIXES */
         .calendar-task-layout {
             display: flex;
             flex-direction: column; 
@@ -216,90 +217,68 @@
         .task-section { flex-grow: 1; }
 
         @media (min-width: 768px) {
-            .calendar-task-layout { flex-direction: row; }
+            .calendar-task-layout { 
+                flex-direction: row; 
+                align-items: flex-start; /* Align calendar and tasks to the top */
+            }
             .calendar-wrapper { max-width: 320px; }
         }
         
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        
+        /* Specific fix for task input section */
+        .task-input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px; /* Added small gap between label, textarea, and button */
+        }
+        
+        /* Ensure textarea takes the space */
+        .task-input-form textarea {
+            min-height: 80px; /* Set a minimum height */
+            resize: vertical;
+        }
+
+        /* Ensure the Add Task button aligns properly */
+        .task-input-form button {
+            align-self: flex-start;
+            width: auto !important; /* Override the 100% width often applied to .btn-primary */
+            margin-top: 0;
+            padding: 8px 15px; /* Slightly smaller button for better fitting */
+        }
+
+
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 1px; /* Smaller gap */
+            gap: 1px; 
             text-align: center;
             font-size: 0.9rem;
         }
+        /* ... (rest of calendar styles remain the same) */
+
         .calendar-day-name { font-weight: 700; color: #fcd34d; padding: 8px 0; }
         body.light-mode .calendar-day-name { color: #1e40af; }
-
-        .calendar-day {
-            padding: 8px 0px;
-            border-radius: 4px; 
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            line-height: 1;
-        }
-
+        .calendar-day { padding: 8px 0px; border-radius: 4px; cursor: pointer; transition: all 0.2s; position: relative; line-height: 1; }
         .calendar-day.inactive { visibility: hidden; pointer-events: none; }
         .calendar-day:hover { background-color: rgba(252, 211, 77, 0.1); }
-        
-        .calendar-day.today {
-            background-color: rgba(59, 130, 246, 0.2); 
-            border: 1px solid #3b82f6;
-            font-weight: 600;
-        }
-        .calendar-day.selected {
-            background-color: #3b82f6;
-            color: white;
-            font-weight: 700;
-        }
-        
-        .task-dot {
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 4px;
-            height: 4px; 
-            background-color: #10b981; /* Teal dot for task */
-            border-radius: 50%;
-        }
+        .calendar-day.today { background-color: rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; font-weight: 600; }
+        .calendar-day.selected { background-color: #3b82f6; color: white; font-weight: 700; }
+        .task-dot { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background-color: #10b981; border-radius: 50%; }
 
-        .task-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            background: rgba(55, 65, 81, 0.5); /* Dark background for task item */
-            transition: background 0.3s ease;
-        }
-        body.light-mode .task-item {
-            background: #f3f4f6;
-            color: #1f2937;
-        }
+        .task-display { margin-top: 20px; padding-top: 15px; border-top: 1px solid #374151; }
+        body.light-mode .task-display { border-top-color: #d1d5db; }
+        .task-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: rgba(55, 65, 81, 0.5); transition: background 0.3s ease; }
+        body.light-mode .task-item { background: #f3f4f6; color: #1f2937; }
         
         /* THEME TOGGLE */
         .theme-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #fcd34d;
-            color: #1f2937;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 1.2rem;
-            z-index: 1000;
+            position: fixed; top: 10px; right: 10px; width: 50px; height: 50px; border-radius: 50%;
+            background: #fcd34d; color: #1f2937; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-size: 1.2rem; z-index: 1000;
         }
+        body.light-mode .theme-toggle { background: #1f2937; color: #fcd34d; }
         
-        body.light-mode .theme-toggle {
-            background: #1f2937;
-            color: #fcd34d;
-        }
-        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -398,11 +377,13 @@
 
                 <div class="task-section">
                     <h3 id="selectedDateTitle">Select a date on the calendar</h3>
-                    <div class="form-group" style="margin-top: 15px;">
+                    
+                    <div class="form-group task-input-form" style="margin-top: 15px;">
                         <label for="taskInput">New Task/Work</label>
-                        <textarea id="taskInput" placeholder="E.g., Complete Modern Physics chapter, Make your task here" rows="2"></textarea>
-                        <button class="btn-primary" style="width: auto; align-self: flex-start; margin-top: 5px;" onclick="addTask()">Add Task</button>
+                        <textarea id="taskInput" placeholder="E.g., Complete Modern Physics chapter, make your task here" rows="2"></textarea>
+                        <button class="btn-primary" onclick="addTask()">Add Task</button>
                     </div>
+
                     <div class="task-display">
                         <h4 style="margin-bottom: 10px; color: #63b3ed;">Pending Tasks:</h4>
                         <div id="taskList">
@@ -440,8 +421,9 @@
             if (savedTheme === 'light') {
                 document.body.classList.add('light-mode');
                 document.getElementById('themeToggle').textContent = '🌙';
+            } else {
+                 document.getElementById('themeToggle').textContent = '☀️';
             }
-            // Fix chart colors on load
             updateChart(); 
         }
 
@@ -631,7 +613,7 @@
                         {
                             label: 'Chemistry',
                             data: tests.map(t => t.chemistry),
-                            borderColor: '#0d9488', /* Teal */
+                            borderColor: '#0d9488', 
                             backgroundColor: 'rgba(13, 148, 136, 0.1)',
                             borderWidth: 2,
                             tension: 0.4
@@ -639,7 +621,7 @@
                         {
                             label: 'Maths',
                             data: tests.map(t => t.maths),
-                            borderColor: '#fcd34d', /* Gold */
+                            borderColor: '#fcd34d', 
                             backgroundColor: 'rgba(252, 211, 77, 0.1)',
                             borderWidth: 2,
                             tension: 0.4
