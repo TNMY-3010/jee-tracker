@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Performance & Planner | Animated & Glowing (Fixed)</title>
+    <title>JEE Performance & Planner | FINAL STABLE BUILD</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         /* BASE & RESET */
         :root {
             /* Minimalist Dark Mode Colors */
-            --color-dark-bg: #0c0c0c; /* Deep Black */
-            --color-dark-card: #1e1e1e; /* Darker card background */
+            --color-dark-bg: #0c0c0c; 
+            --color-dark-card: #1e1e1e; 
             --color-dark-text: #f0f0f0;
             --color-dark-subtext: #999;
-            --color-dark-border: #383838; /* Soft Border */
+            --color-dark-border: #383838; 
             --color-dark-primary: #ffffff; 
             --color-dark-secondary: #242424; 
-            --color-dark-accent: #8a2be2; /* BlueViolet for glow/highlight */
+            --color-dark-accent: #8a2be2; 
 
             /* Minimalist Light Mode Colors */
             --color-light-bg: #f5f5f5; 
@@ -26,7 +26,7 @@
             --color-light-border: #ccc;
             --color-light-primary: #000000;
             --color-light-secondary: #e0e0e0;
-            --color-light-accent: #9370db; /* MediumPurple */
+            --color-light-accent: #9370db; 
             
             --transition-speed: 0.3s;
             --pulse-speed: 2s;
@@ -35,6 +35,7 @@
         }
 
         /* KEYFRAMES FOR ANIMATIONS */
+        /* SIMPLIFIED FADE-IN for stability */
         @keyframes fadeInSlideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -99,8 +100,7 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4), inset 0 0 0 1px var(--color-dark-border), 0 0 10px rgba(138, 43, 226, 0.2); 
             border: none;
             transition: all var(--transition-speed) ease, transform 0.2s;
-            opacity: 0; 
-            transform: translateY(20px); 
+            /* REMOVE OPACITY/TRANSFORM HERE - LET JS/KEYFRAME CONTROL IT */
         }
         
         body.light-mode .card {
@@ -883,7 +883,7 @@
             });
         });
 
-        // --- VIEW SWITCHER (FIXED LOGIC) ---
+        // --- VIEW SWITCHER (STABLE LOGIC) ---
         function switchView(viewId, button) {
             // 1. Hide all views and remove active status from tabs
             document.querySelectorAll('.view').forEach(view => {
