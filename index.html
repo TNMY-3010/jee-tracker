@@ -29,7 +29,7 @@
             --transition-speed: 0.3s;
             --pulse-speed: 2s;
             --font-mono: 'Menlo', 'Consolas', 'Monaco', monospace;
-            --font-sans: 'Inter', -apple-system, BlinkMacMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         * {
@@ -38,7 +38,6 @@
             box-sizing: border-box;
         }
         
-        /* FIX 1: Ensure smooth scroll and background stability */
         html {
             scroll-behavior: smooth;
         }
@@ -191,9 +190,54 @@
             letter-spacing: 2px;
         }
 
-        /* CALENDAR STYLES */
+        /* CALENDAR STYLES (FIXED) */
+        .calendar-wrapper { 
+            /* Removing restrictive properties from parent */
+            max-width: 100%; 
+            flex-shrink: 0; 
+        }
         .calendar-task-layout { 
-            overflow: hidden; /* FIX 2: Prevent inner calendar from overflowing layout */
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            padding-top: 10px; 
+            /* Remove overflow: hidden if it's the culprit */
+            overflow: visible; 
+        }
+        
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            gap: 1px; 
+            text-align: center; 
+            font-size: 0.85rem; 
+            border: 1px solid var(--color-dark-border); 
+            border-radius: 4px; 
+            overflow: hidden;
+            /* Ensure the calendar grid is big enough */
+            min-width: 280px;
+        }
+        .calendar-day-name { 
+            font-weight: 600; 
+            color: var(--color-dark-text); 
+            padding: 8px 0; 
+            background: var(--color-dark-secondary); 
+            /* Ensure Day Names don't break the grid */
+            border: 1px solid var(--color-dark-border);
+            border-top: none;
+            border-right: none;
+        }
+        .calendar-day { 
+            padding: 10px 0; 
+            cursor: pointer; 
+            transition: background 0.1s ease, color 0.1s ease;
+            position: relative; 
+            border: 1px solid var(--color-dark-border);
+            /* Ensure the days are explicitly part of the grid flow */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40px; /* fixed height for uniformity */
         }
         .calendar-day.selected { 
             transform: scale(1.05);
@@ -466,8 +510,6 @@
                 }, 50 * index);
             });
         }
-        
-        // --- Utility: Background Scroll Fix (Removed explicit JS parallax listener for stability) ---
         
         // --- Utility: Button Ripple Effect ---
         document.querySelectorAll('button').forEach(button => {
@@ -780,7 +822,7 @@
             }).join('');
         }
         
-        // --- Calendar & Task Functions (Unchanged) ---
+        // --- Calendar & Task Functions (Unchanged Logic, now relying on fixed CSS) ---
         function loadTasks() {
             const savedTasks = localStorage.getItem('jee-tasks');
             if (savedTasks) {
@@ -928,7 +970,7 @@
             }
         }
         
-        // --- Study Log Functions (Unchanged) ---
+        // --- Study Log Functions (Unchanged Logic) ---
         function loadStudyLogs() {
             const savedLogs = localStorage.getItem('jee-study-logs');
             if (savedLogs) {
@@ -1062,7 +1104,7 @@
             });
         }
         
-        // --- Stopwatch Functions (Unchanged) ---
+        // --- Stopwatch Functions (Unchanged Logic) ---
         function formatTime(ms) {
             const totalSeconds = Math.floor(ms / 1000);
             const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
