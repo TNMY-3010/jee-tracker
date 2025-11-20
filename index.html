@@ -101,8 +101,6 @@
             transition: all var(--transition-speed) ease, transform 0.2s;
             opacity: 0; 
             transform: translateY(20px); 
-            /* Base animation class - will be applied by JS only to visible view */
-            /* animation: fadeInSlideUp 0.6s ease-out forwards; */ 
         }
         
         body.light-mode .card {
@@ -119,7 +117,7 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2), 0 0 20px var(--color-light-accent); 
         }
         
-        /* FIX: Ensure cards are visible when their parent view is active */
+        /* FIX: Animation is triggered only when the parent view is NOT hidden */
         .view:not(.hidden) .card {
              animation: fadeInSlideUp 0.6s ease-out forwards;
         }
@@ -850,17 +848,17 @@
         
         // --- Utility: Card Animations on Load ---
         function animateCards(viewId = 'performanceView') {
-            // Apply animations only to cards in the currently visible view
             const visibleView = document.getElementById(viewId);
             if (!visibleView) return;
 
             const cards = visibleView.querySelectorAll('.card');
             cards.forEach((card, index) => {
-                // Reset styles to ensure animation runs every time the view is switched
+                // Ensure card state is reset before applying staggered animation
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(20px)';
 
                 setTimeout(() => {
+                    // This triggers the CSS keyframe animation for a smooth slide-in
                     card.style.opacity = '1';
                     card.style.transform = 'translateY(0)';
                 }, 50 * index);
@@ -886,26 +884,23 @@
             });
         });
 
-        // --- VIEW SWITCHER (FIXED) ---
+        // --- VIEW SWITCHER (FIXED LOGIC) ---
         function switchView(viewId, button) {
+            // 1. Hide all views and remove active status from tabs
             document.querySelectorAll('.view').forEach(view => {
                 view.classList.add('hidden');
-                // Immediately reset opacity and transform for hidden views to ensure smooth re-entry
-                view.querySelectorAll('.card').forEach(card => {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px)';
-                });
             });
             
-            const targetView = document.getElementById(viewId);
-            targetView.classList.remove('hidden');
-
             document.querySelectorAll('.navigation-tabs button').forEach(btn => {
                 btn.classList.remove('active');
             });
+
+            // 2. Show the target view and set active tab
+            const targetView = document.getElementById(viewId);
+            targetView.classList.remove('hidden');
             button.classList.add('active');
 
-            // Re-render and Animate the target view
+            // 3. Render content and trigger animation for the newly visible view
             if (viewId === 'studentHubView') {
                 renderGoals();
                 renderStudentNotes(); 
@@ -930,16 +925,17 @@
             loadGoals(); 
             loadStudentNotes(); 
             loadTheme();
-            updateUI(); 
             
             renderCalendar(); 
             selectDate(new Date().toDateString()); 
             
-            // FIX: Set initial state and animate the default view
+            // FIX: Set initial state by explicitly showing P&P and hiding Student Hub, then animating P&P.
             document.getElementById('studentHubView').classList.add('hidden');
             document.getElementById('performanceView').classList.remove('hidden');
             document.querySelector('.navigation-tabs button:first-child').classList.add('active');
-            animateCards('performanceView');
+            
+            updateUI(); // Initial render for P&P content
+            animateCards('performanceView'); // Animate the default view
         };
 
         // --- Theme Functions (Unchanged) ---
